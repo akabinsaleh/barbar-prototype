@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book — Maqaṣṣ</title>
+  <meta name="description" content="Reserve a chair. Choose service, barber, date and time." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..600,30..100&family=Geist:wght@300..700&family=Rubik:wght@400..700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="book">
+
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a href="index.html" class="brand" data-i18n="brand">MAQAṢṢ</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="index.html"    data-nav="home"     data-i18n="nav.home">Home</a>
+        <a href="services.html" data-nav="services" data-i18n="nav.services">Services</a>
+        <a href="book.html"     data-nav="book"     data-i18n="nav.book">Book</a>
+        <a href="mine.html"     data-nav="mine"     data-i18n="nav.mine">My Bookings</a>
+      </nav>
+      <button class="lang-toggle" type="button" aria-label="Toggle language">
+        <span data-lang="en">EN</span>
+        <span aria-hidden="true">/</span>
+        <span data-lang="ar" style="font-family: 'Rubik', sans-serif; font-size: 14px;">ع</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="page-head">
+      <div class="shell page-head__inner">
+        <div class="section-label" style="margin-block-end: 18px;">
+          <span>03 — <span data-i18n="section.book">Reserve</span></span>
+        </div>
+        <h1 class="display page-head__title" data-i18n="book.page.title">Reserve a chair.</h1>
+        <p class="page-head__sub" data-i18n="book.page.sub">
+          Four steps. A minute, no more.
+        </p>
+      </div>
+    </section>
+
+    <section class="booking-v2" id="book">
+      <div class="shell booking-v2__layout">
+
+        <!-- Left column: chapter list (table of contents) -->
+        <aside class="chapters">
+          <div class="section-label chapters__label">
+            <span data-i18n="booking.toc">Reservation</span>
+          </div>
+          <ol class="chapters__list">
+            <li class="chapter" data-step="1" data-active="true">
+              <span class="chapter__no">I</span>
+              <span class="chapter__name" data-i18n="step.1">Service</span>
+              <span class="chapter__value" data-slot="service">—</span>
+            </li>
+            <li class="chapter" data-step="2">
+              <span class="chapter__no">II</span>
+              <span class="chapter__name" data-i18n="step.2">Barber</span>
+              <span class="chapter__value" data-slot="barber">—</span>
+            </li>
+            <li class="chapter" data-step="3">
+              <span class="chapter__no">III</span>
+              <span class="chapter__name" data-i18n="step.3">Date &amp; Time</span>
+              <span class="chapter__value" data-slot="datetime">—</span>
+            </li>
+            <li class="chapter" data-step="4">
+              <span class="chapter__no">IV</span>
+              <span class="chapter__name" data-i18n="step.4">Your Details</span>
+              <span class="chapter__value" data-slot="details">—</span>
+            </li>
+          </ol>
+
+          <div class="chapters__total" id="chapters-total">
+            <span class="chapters__total-k" data-i18n="summary.price">Total</span>
+            <span class="chapters__total-v" data-slot="total">—</span>
+          </div>
+        </aside>
+
+        <!-- Right column: active step -->
+        <div class="booking-v2__panel">
+
+          <div class="step" data-step="1" data-active="true">
+            <div class="step__head">
+              <span class="step__num">I.</span>
+              <h2 class="step__title" data-i18n="step1.title">Choose a service.</h2>
+            </div>
+            <div class="row-list" id="choice-services"></div>
+          </div>
+
+          <div class="step" data-step="2">
+            <div class="step__head">
+              <span class="step__num">II.</span>
+              <h2 class="step__title" data-i18n="step2.title">Choose your barber.</h2>
+            </div>
+            <div class="row-list" id="choice-barbers"></div>
+          </div>
+
+          <div class="step" data-step="3">
+            <div class="step__head">
+              <span class="step__num">III.</span>
+              <h2 class="step__title" data-i18n="step3.title">Pick a date and time.</h2>
+            </div>
+
+            <div class="date-nav">
+              <span class="date-nav__month" id="date-month">—</span>
+              <div class="date-nav__btns">
+                <button class="date-nav__btn" type="button" id="date-prev" aria-label="Previous dates">
+                  <span aria-hidden="true">←</span>
+                </button>
+                <button class="date-nav__btn" type="button" id="date-next" aria-label="Next dates">
+                  <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </div>
+            <div class="date-strip" id="date-strip" tabindex="0"></div>
+
+            <div class="time-sections" id="time-sections"></div>
+          </div>
+
+          <div class="step" data-step="4">
+            <div class="step__head">
+              <span class="step__num">IV.</span>
+              <h2 class="step__title" data-i18n="step4.title">Tell us who you are.</h2>
+            </div>
+
+            <div class="form-grid">
+              <div class="field" data-field="name">
+                <label data-i18n="form.name">Full name</label>
+                <input type="text" autocomplete="name" data-i18n-ph="form.name.placeholder" placeholder="e.g. Faisal Al-Sayed" />
+                <div class="field__err" data-i18n="form.err.name">Please enter your name.</div>
+              </div>
+
+              <div class="field" data-field="phone">
+                <label data-i18n="form.phone">Phone</label>
+                <input type="tel" inputmode="tel" autocomplete="tel" data-i18n-ph="form.phone.placeholder" placeholder="05X XXX XXXX" />
+                <div class="field__err" data-i18n="form.err.phone">Please enter a valid phone number.</div>
+              </div>
+
+              <div class="field field--full" data-field="notes">
+                <label data-i18n="form.notes">Notes (optional)</label>
+                <textarea rows="2" data-i18n-ph="form.notes.placeholder" placeholder="Anything we should know"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="step confirm" id="confirm" data-step="0">
+            <h2 class="confirm__title" data-i18n="confirm.title">Reserved.</h2>
+            <p class="confirm__sub" data-i18n="confirm.sub">
+              We look forward to seeing you. A confirmation has been kept for your records.
+            </p>
+            <div class="confirm__id">
+              <span class="confirm__id-k" data-i18n="confirm.id">Reservation №</span>
+              <span class="confirm__id-v" id="confirm-id-v">—</span>
+            </div>
+            <div class="hero__cta-row">
+              <button class="btn-primary" id="confirm-book-again" type="button">
+                <span data-i18n="btn.book">Book another</span>
+                <span class="arrow" aria-hidden="true">→</span>
+              </button>
+              <a class="btn-ghost" href="mine.html" data-i18n="btn.viewMine">
+                See my bookings
+              </a>
+            </div>
+          </div>
+
+          <div class="step-nav">
+            <button class="btn-ghost" id="step-back" type="button">
+              <span aria-hidden="true">←</span>
+              <span data-i18n="btn.back">Back</span>
+            </button>
+            <button class="btn-primary" id="step-next" type="button">
+              <span class="btn-label" data-i18n="btn.next">Continue</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </button>
+          </div>
+
+          <!-- Hidden summary kept for backwards-compatible code paths -->
+          <div id="summary" hidden></div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="shell footer">
+      <div>
+        <span class="brand" data-i18n="brand">MAQAṢṢ</span>
+        <span class="footer__legal" data-i18n="footer.legal">© 2026 Maqaṣṣ. A prototype.</span>
+      </div>
+      <div>
+        <h4 data-i18n="footer.hours.title">Hours</h4>
+        <p data-i18n="footer.hours.body">Daily — 10:00 to 21:00
+Fridays — 14:00 to 21:00</p>
+      </div>
+      <div>
+        <h4 data-i18n="footer.find.title">Find Us</h4>
+        <p data-i18n="footer.find.body">Al-Olaya, Riyadh
++966 5X XXX XXXX</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

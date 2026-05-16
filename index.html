@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Maqaṣṣ — A House of Barbering</title>
+  <meta name="description" content="A bilingual barbershop prototype. Reserve a chair." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..600,30..100&family=Geist:wght@300..700&family=Rubik:wght@400..700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="home">
+
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a href="index.html" class="brand" data-i18n="brand">MAQAṢṢ</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="index.html"    data-nav="home"     data-i18n="nav.home">Home</a>
+        <a href="services.html" data-nav="services" data-i18n="nav.services">Services</a>
+        <a href="book.html"     data-nav="book"     data-i18n="nav.book">Book</a>
+        <a href="mine.html"     data-nav="mine"     data-i18n="nav.mine">My Bookings</a>
+      </nav>
+      <button class="lang-toggle" type="button" aria-label="Toggle language">
+        <span data-lang="en">EN</span>
+        <span aria-hidden="true">/</span>
+        <span data-lang="ar" style="font-family: 'Rubik', sans-serif; font-size: 14px;">ع</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="shell">
+        <div class="hero__grid">
+          <div class="hero__left">
+            <div class="hero__meta">
+              <span class="eyebrow" data-i18n="meta.tag">EST. 2024 — RIYADH — N° 02</span>
+              <span class="hero__meta-rule"></span>
+            </div>
+
+            <h1 class="display hero__headline">
+              <span class="word"><span data-i18n="hero.headline.1">A</span></span>
+              <span class="word"><span data-i18n="hero.headline.2">Proper</span></span>
+              <span class="word"><span data-i18n="hero.headline.3">Cut.</span></span>
+            </h1>
+
+            <p class="hero__sub" data-i18n="hero.sub">
+              Five services. Four hands. One chair that has held a thousand stories. Reservations open daily, ten until nine.
+            </p>
+
+            <div class="hero__cta-row">
+              <a href="book.html" class="btn-primary">
+                <span data-i18n="hero.cta">Reserve a Chair</span>
+                <span class="arrow" aria-hidden="true">→</span>
+              </a>
+              <a href="services.html" class="btn-ghost" data-i18n="nav.services">Services</a>
+            </div>
+          </div>
+
+          <div class="hero__right">
+            <span class="hero__image-label" data-i18n="hero.eyebrow">A House of Barbering</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Barbers -->
+    <section class="section" id="barbers">
+      <div class="shell">
+        <div class="section__head">
+          <h2 class="section__title display" data-i18n="section.barbers">Hands</h2>
+          <div class="section-label"><span>II</span></div>
+        </div>
+        <div class="barbers" id="barbers-list"></div>
+      </div>
+    </section>
+
+    <!-- Services teaser → links to services.html -->
+    <section class="section teaser">
+      <div class="shell">
+        <div class="teaser__grid">
+          <div>
+            <div class="section-label" style="margin-block-end: 24px;">
+              <span>III — <span data-i18n="section.services">Services</span></span>
+            </div>
+            <h2 class="display teaser__title" data-i18n="home.teaser.title">A short menu, carefully kept.</h2>
+            <p class="teaser__sub" data-i18n="home.teaser.sub">
+              Five services. Begin with a classic; end with the kids. Each is a sitting, never a passing.
+            </p>
+            <a href="services.html" class="btn-primary">
+              <span data-i18n="home.teaser.cta">See the full menu</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+          <ol class="teaser__list">
+            <li><span class="teaser__no">i.</span>   <span data-i18n="services.classic.name">Classic Haircut</span></li>
+            <li><span class="teaser__no">ii.</span>  <span data-i18n="services.beard.name">Beard Trim</span></li>
+            <li><span class="teaser__no">iii.</span> <span data-i18n="services.shave.name">Hot Towel Shave</span></li>
+            <li><span class="teaser__no">iv.</span>  <span data-i18n="services.combo.name">Hair &amp; Beard</span></li>
+            <li><span class="teaser__no">v.</span>   <span data-i18n="services.kids.name">Kids Cut</span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA band -->
+    <section class="cta-band">
+      <div class="shell cta-band__inner">
+        <h2 class="display cta-band__title" data-i18n="home.cta.title">The chair is waiting.</h2>
+        <a href="book.html" class="btn-primary">
+          <span data-i18n="hero.cta">Reserve a Chair</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="shell footer">
+      <div>
+        <span class="brand" data-i18n="brand">MAQAṢṢ</span>
+        <span class="footer__legal" data-i18n="footer.legal">© 2026 Maqaṣṣ. A prototype.</span>
+      </div>
+      <div>
+        <h4 data-i18n="footer.hours.title">Hours</h4>
+        <p data-i18n="footer.hours.body">Daily — 10:00 to 21:00
+Fridays — 14:00 to 21:00</p>
+      </div>
+      <div>
+        <h4 data-i18n="footer.find.title">Find Us</h4>
+        <p data-i18n="footer.find.body">Al-Olaya, Riyadh
++966 5X XXX XXXX</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — Maqaṣṣ</title>
+  <meta name="description" content="Owner dashboard for reservations." />
+  <meta name="robots" content="noindex,nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..600,30..100&family=Geist:wght@300..700&family=Rubik:wght@400..700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    /* ============================================================
+       Admin-only styles — scoped to body[data-page="admin"]
+       Uses existing tokens from styles.css.
+       ============================================================ */
+    .admin-stats{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--hairline);
+      border-block: 1px solid var(--hairline);
+      margin-block-end: 32px;
+    }
+    .admin-stat{
+      background: var(--paper);
+      padding: 24px 20px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .admin-stat__k{
+      font-size: 11px; letter-spacing:.22em; text-transform:uppercase;
+      color: var(--mute); font-weight: 500;
+    }
+    [lang="ar"] .admin-stat__k{ letter-spacing:.04em; text-transform:none; font-size:13px; }
+    .admin-stat__v{
+      font-family: var(--serif); font-weight: 380;
+      font-variation-settings:"opsz" 144,"SOFT" 30;
+      font-size: clamp(34px, 4vw, 48px);
+      line-height: 1;
+      letter-spacing: -.02em;
+    }
+    [lang="ar"] .admin-stat__v{ font-family: var(--ar-serif); font-weight: 600; }
+
+    .admin-toolbar{
+      display:grid;
+      grid-template-columns: 1fr 180px 180px 180px auto;
+      gap: 12px;
+      align-items: center;
+      margin-block-end: 24px;
+    }
+    .admin-toolbar input,
+    .admin-toolbar select{
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--paper);
+      border: 1px solid var(--hairline-2);
+      border-radius: 0;
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--ink);
+      transition: border-color .2s var(--ease);
+    }
+    [lang="ar"] .admin-toolbar input,
+    [lang="ar"] .admin-toolbar select{ font-family: var(--ar-sans); }
+    .admin-toolbar input:focus,
+    .admin-toolbar select:focus{ outline: none; border-color: var(--ink); }
+    .admin-toolbar input::placeholder{ color: var(--mute); }
+
+    .admin-actions{ display:flex; gap: 10px; }
+    .admin-btn{
+      font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--mute);
+      padding: 12px 16px;
+      border: 1px solid var(--hairline-2);
+      border-radius: 999px;
+      background: transparent;
+      transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+      white-space: nowrap;
+    }
+    [lang="ar"] .admin-btn{ letter-spacing:.04em; text-transform:none; font-family: var(--ar-sans); }
+    .admin-btn:hover{ color: var(--ink); border-color: var(--ink); }
+    .admin-btn.is-danger:hover{ color: #b3261e; border-color: #b3261e; }
+
+    /* Table */
+    .admin-table{
+      display:flex; flex-direction: column;
+    }
+    .admin-row{
+      display:grid;
+      grid-template-columns: 110px 1.2fr 1fr 1.2fr 1.2fr auto;
+      align-items: baseline;
+      gap: 20px;
+      padding-block: 18px;
+      border-block-start: 1px solid var(--hairline);
+    }
+    .admin-row:last-child{ border-block-end: 1px solid var(--hairline); }
+    .admin-row--head{
+      padding-block: 12px;
+      border-block-start: 1px solid var(--rule);
+      border-block-end: 1px solid var(--hairline-2);
+    }
+    .admin-row--head span{
+      font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--mute); font-weight: 500;
+    }
+    [lang="ar"] .admin-row--head span{ letter-spacing:.04em; text-transform:none; font-size:12px; }
+
+    .admin-row__id{
+      font-family: var(--serif); font-style: italic;
+      color: var(--mute); font-size: 13px;
+    }
+    .admin-row__name{
+      font-family: var(--serif); font-size: 20px; line-height: 1.1;
+    }
+    [lang="ar"] .admin-row__name{ font-family: var(--ar-serif); font-weight: 600; }
+    .admin-row__sub{
+      display:block; font-family: var(--sans);
+      font-size: 11px; letter-spacing:.18em; text-transform: uppercase;
+      color: var(--mute); margin-block-start: 4px;
+    }
+    [lang="ar"] .admin-row__sub{ font-family: var(--ar-sans); letter-spacing:.04em; text-transform:none; font-size:12px; }
+
+    .admin-row__svc{ font-family: var(--serif); font-size: 16px; }
+    [lang="ar"] .admin-row__svc{ font-family: var(--ar-serif); font-weight: 500; }
+
+    .admin-row__when{ font-family: var(--serif); font-size: 16px; line-height: 1.2; }
+    [lang="ar"] .admin-row__when{ font-family: var(--ar-serif); font-weight: 500; }
+    .admin-row__when small{
+      display:block;
+      font-family: var(--sans); font-size: 11px; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--mute); margin-block-start: 4px;
+    }
+    [lang="ar"] .admin-row__when small{ font-family: var(--ar-sans); letter-spacing:.04em; text-transform:none; font-size:12px; }
+
+    .admin-row__contact{ font-family: var(--sans); font-size: 13px; line-height: 1.4; }
+    .admin-row__contact a{
+      color: var(--ink); border-block-end: 1px solid var(--hairline-2);
+    }
+    .admin-row__contact a:hover{ border-block-end-color: var(--ink); }
+    .admin-row__contact small{
+      display:block; color: var(--mute); font-size: 11px;
+      margin-block-start: 4px; font-style: italic;
+      font-family: var(--serif);
+    }
+    [lang="ar"] .admin-row__contact small{ font-family: var(--ar-serif); font-style: normal; }
+
+    .admin-row__actions{ display:flex; gap: 8px; justify-content: flex-end; }
+    .admin-row__del{
+      font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--mute);
+      padding: 8px 14px;
+      border: 1px solid var(--hairline-2);
+      border-radius: 999px;
+      transition: color .2s var(--ease), border-color .2s var(--ease);
+    }
+    [lang="ar"] .admin-row__del{ letter-spacing:.04em; text-transform:none; }
+    .admin-row__del:hover{ color: #b3261e; border-color: #b3261e; }
+    .admin-row__del.is-danger{ color:#b3261e; border-color:#b3261e; }
+    .admin-row__keep{
+      font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--mute);
+      padding: 8px 14px;
+      border: 1px solid var(--hairline-2);
+      border-radius: 999px;
+    }
+    [lang="ar"] .admin-row__keep{ letter-spacing:.04em; text-transform:none; }
+    .admin-row__keep[hidden]{ display: none; }
+    .admin-row__keep:hover{ color: var(--ink); border-color: var(--ink); }
+
+    .admin-empty{
+      padding: 64px 0;
+      text-align: center;
+      font-family: var(--serif); font-style: italic;
+      font-size: clamp(20px, 2vw, 26px);
+      color: var(--mute);
+    }
+    [lang="ar"] .admin-empty{ font-family: var(--ar-serif); font-style: normal; }
+
+    .admin-warn{
+      font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--mute);
+      padding: 10px 14px;
+      border: 1px dashed var(--hairline-2);
+      border-radius: 4px;
+      margin-block-start: 32px;
+      display: inline-block;
+    }
+    [lang="ar"] .admin-warn{ letter-spacing:.04em; text-transform:none; font-size:13px; }
+
+    @media (max-width: 1024px){
+      .admin-toolbar{ grid-template-columns: 1fr 1fr; }
+      .admin-actions{ grid-column: 1 / -1; justify-content: flex-end; }
+      .admin-row{
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .admin-row--head{ display: none; }
+      .admin-row__actions{ grid-column: 1 / -1; justify-content: flex-start; }
+      .admin-stats{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px){
+      .admin-row{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-page="admin">
+
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a href="index.html" class="brand" data-i18n="brand">MAQAṢṢ</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="index.html"    data-nav="home"     data-i18n="nav.home">Home</a>
+        <a href="services.html" data-nav="services" data-i18n="nav.services">Services</a>
+        <a href="book.html"     data-nav="book"     data-i18n="nav.book">Book</a>
+        <a href="mine.html"     data-nav="mine"     data-i18n="nav.mine">My Bookings</a>
+      </nav>
+      <button class="lang-toggle" type="button" aria-label="Toggle language">
+        <span data-lang="en">EN</span>
+        <span aria-hidden="true">/</span>
+        <span data-lang="ar" style="font-family: 'Rubik', sans-serif; font-size: 14px;">ع</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="page-head">
+      <div class="shell page-head__inner">
+        <div class="section-label" style="margin-block-end: 18px;">
+          <span>05 — <span data-admin-i18n="section.admin">The Ledger</span></span>
+        </div>
+        <h1 class="display page-head__title" data-admin-i18n="admin.title">The ledger.</h1>
+        <p class="page-head__sub" data-admin-i18n="admin.sub">
+          Every reservation on the books.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section--top-tight">
+      <div class="shell">
+
+        <!-- Stats strip -->
+        <div class="admin-stats" id="admin-stats" aria-live="polite"></div>
+
+        <!-- Filter / search toolbar -->
+        <div class="admin-toolbar">
+          <input
+            type="search"
+            id="admin-search"
+            placeholder="Search by name, phone, or id…"
+            data-admin-i18n-ph="admin.search.ph"
+            aria-label="Search"
+          />
+          <select id="admin-filter-barber" aria-label="Filter by barber">
+            <option value="" data-admin-i18n="admin.filter.barber.all">All barbers</option>
+          </select>
+          <select id="admin-filter-service" aria-label="Filter by service">
+            <option value="" data-admin-i18n="admin.filter.service.all">All services</option>
+          </select>
+          <select id="admin-filter-when" aria-label="Filter by date range">
+            <option value="all"      data-admin-i18n="admin.filter.when.all">All dates</option>
+            <option value="upcoming" data-admin-i18n="admin.filter.when.upcoming">Upcoming</option>
+            <option value="today"    data-admin-i18n="admin.filter.when.today">Today</option>
+            <option value="past"     data-admin-i18n="admin.filter.when.past">Past</option>
+          </select>
+          <div class="admin-actions">
+            <button type="button" class="admin-btn" id="admin-export"
+                    data-admin-i18n="admin.export">Export CSV</button>
+            <button type="button" class="admin-btn is-danger" id="admin-clear"
+                    data-admin-i18n="admin.clear">Clear all</button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="admin-table" id="admin-table"></div>
+
+        <p class="admin-warn" data-admin-i18n="admin.warn">
+          Local prototype — data lives in this browser only.
+        </p>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="shell footer">
+      <div>
+        <span class="brand" data-i18n="brand">MAQAṢṢ</span>
+        <span class="footer__legal" data-i18n="footer.legal">© 2026 Maqaṣṣ. A prototype.</span>
+      </div>
+      <div>
+        <h4 data-i18n="footer.hours.title">Hours</h4>
+        <p data-i18n="footer.hours.body">Daily — 10:00 to 21:00
+Fridays — 14:00 to 21:00</p>
+      </div>
+      <div>
+        <h4 data-i18n="footer.find.title">Find Us</h4>
+        <p data-i18n="footer.find.body">Al-Olaya, Riyadh
++966 5X XXX XXXX</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Admin runs as its own module — reuses data.js + i18n.js, no edits to app.js. -->
+  <script type="module">
+    import { dict } from './js/i18n.js';
+    import { services, barbers, CURRENCY } from './js/data.js';
+
+    /* Admin-only labels — kept inline so i18n.js stays untouched. */
+    const adminDict = {
+      en: {
+        'section.admin':              'The Ledger',
+        'admin.title':                'The ledger.',
+        'admin.sub':                  'Every reservation on the books.',
+        'admin.stat.total':           'Total bookings',
+        'admin.stat.upcoming':        'Upcoming',
+        'admin.stat.today':           'Today',
+        'admin.stat.revenue':         'Booked revenue',
+        'admin.search.ph':            'Search by name, phone, or id…',
+        'admin.filter.barber.all':    'All barbers',
+        'admin.filter.service.all':   'All services',
+        'admin.filter.when.all':      'All dates',
+        'admin.filter.when.upcoming': 'Upcoming',
+        'admin.filter.when.today':    'Today',
+        'admin.filter.when.past':     'Past',
+        'admin.export':               'Export CSV',
+        'admin.clear':                'Clear all',
+        'admin.clear.confirm':        'Delete every booking? This cannot be undone.',
+        'admin.warn':                 'Local prototype — data lives in this browser only.',
+        'admin.empty':                'No bookings match.',
+        'admin.col.id':               'Ref.',
+        'admin.col.guest':            'Guest',
+        'admin.col.service':          'Service',
+        'admin.col.when':             'When',
+        'admin.col.contact':          'Contact',
+        'admin.col.actions':          '',
+        'admin.del':                  'Delete',
+        'admin.del.confirm':          'Tap again',
+        'admin.keep':                 'Keep',
+        'admin.notes':                'Note',
+        'admin.booked':               'booked',
+      },
+      ar: {
+        'section.admin':              'السجل',
+        'admin.title':                'السجل.',
+        'admin.sub':                  'كل الحجوزات المسجَّلة.',
+        'admin.stat.total':           'إجمالي الحجوزات',
+        'admin.stat.upcoming':        'القادمة',
+        'admin.stat.today':           'اليوم',
+        'admin.stat.revenue':         'الإيراد المحجوز',
+        'admin.search.ph':            'ابحث بالاسم أو الرقم أو المعرّف…',
+        'admin.filter.barber.all':    'كل الحلاقين',
+        'admin.filter.service.all':   'كل الخدمات',
+        'admin.filter.when.all':      'كل التواريخ',
+        'admin.filter.when.upcoming': 'القادمة',
+        'admin.filter.when.today':    'اليوم',
+        'admin.filter.when.past':     'السابقة',
+        'admin.export':               'تصدير CSV',
+        'admin.clear':                'حذف الكل',
+        'admin.clear.confirm':        'حذف جميع الحجوزات؟ لا يمكن التراجع.',
+        'admin.warn':                 'نسخة تجريبية — البيانات محفوظة في هذا المتصفح فقط.',
+        'admin.empty':                'لا توجد حجوزات مطابقة.',
+        'admin.col.id':               'المعرّف',
+        'admin.col.guest':            'الزبون',
+        'admin.col.service':          'الخدمة',
+        'admin.col.when':             'الموعد',
+        'admin.col.contact':          'التواصل',
+        'admin.col.actions':          '',
+        'admin.del':                  'حذف',
+        'admin.del.confirm':          'اضغط مرة أخرى',
+        'admin.keep':                 'تراجع',
+        'admin.notes':                'ملاحظة',
+        'admin.booked':               'محجوز',
+      },
+    };
+
+    const state = {
+      lang:    localStorage.getItem('lang') || 'en',
+      search:  '',
+      barber:  '',
+      service: '',
+      when:    'all',
+    };
+
+    /* ---------- helpers ---------- */
+    function t(key) {
+      return adminDict[state.lang][key]
+          ?? dict[state.lang][key]
+          ?? key;
+    }
+    function isoToday() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function parseIso(iso) {
+      if (!iso) return null;
+      const [y,m,d] = iso.split('-').map(Number);
+      return new Date(y, m-1, d);
+    }
+    function formatDateLong(iso) {
+      if (!iso) return '—';
+      const d = parseIso(iso);
+      const days   = dict[state.lang]['days.short'];
+      const months = dict[state.lang]['months.short'];
+      return `${days[d.getDay()]} · ${d.getDate()} ${months[d.getMonth()]}`;
+    }
+    function formatCreated(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      const days   = dict[state.lang]['days.short'];
+      const months = dict[state.lang]['months.short'];
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mm = String(d.getMinutes()).padStart(2,'0');
+      return `${t('admin.booked')} · ${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} · ${hh}:${mm}`;
+    }
+    function loadBookings() {
+      try { return JSON.parse(localStorage.getItem('bookings') || '[]'); }
+      catch { return []; }
+    }
+    function saveBookings(list) {
+      localStorage.setItem('bookings', JSON.stringify(list));
+    }
+    function svcOf(id) { return services.find(s => s.id === id); }
+    function brbOf(id) { return barbers.find(b => b.id === id); }
+
+    /* ---------- language ---------- */
+    function applyLanguage() {
+      document.documentElement.lang = state.lang;
+      document.documentElement.dir  = state.lang === 'ar' ? 'rtl' : 'ltr';
+
+      // toggle pill active state
+      document.querySelectorAll('.lang-toggle [data-lang]').forEach(el => {
+        el.dataset.active = el.dataset.lang === state.lang ? 'true' : 'false';
+      });
+
+      // shared keys (nav, footer, brand) — pull from main dict
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const v = dict[state.lang][el.dataset.i18n];
+        if (typeof v === 'string') el.textContent = v;
+      });
+
+      // admin-specific keys
+      document.querySelectorAll('[data-admin-i18n]').forEach(el => {
+        el.textContent = t(el.dataset.adminI18n);
+      });
+      document.querySelectorAll('[data-admin-i18n-ph]').forEach(el => {
+        el.placeholder = t(el.dataset.adminI18nPh);
+      });
+
+      localStorage.setItem('lang', state.lang);
+      render();
+    }
+    function setLanguage(lang) {
+      if (state.lang === lang) return;
+      document.body.classList.add('lang-fading');
+      setTimeout(() => {
+        state.lang = lang;
+        applyLanguage();
+        requestAnimationFrame(() => document.body.classList.remove('lang-fading'));
+      }, 200);
+    }
+
+    /* ---------- nav highlight ---------- */
+    function highlightActiveNav() {
+      // 'admin' is not in the nav — clear any active marker
+      document.querySelectorAll('[data-nav]').forEach(a => a.dataset.active = 'false');
+    }
+
+    /* ---------- filtering ---------- */
+    function applyFilters(all) {
+      const today = isoToday();
+      const q = state.search.trim().toLowerCase();
+      return all.filter(b => {
+        if (state.barber  && b.barberId  !== state.barber)  return false;
+        if (state.service && b.serviceId !== state.service) return false;
+        if (state.when === 'upcoming' && (b.date || '') <  today) return false;
+        if (state.when === 'today'    && (b.date || '') !== today) return false;
+        if (state.when === 'past'     && (b.date || '') >= today) return false;
+        if (q) {
+          const hay = `${b.name||''} ${b.phone||''} ${b.id||''} ${b.notes||''}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    /* ---------- rendering ---------- */
+    function renderStats(all) {
+      const today    = isoToday();
+      const upcoming = all.filter(b => (b.date || '') >= today);
+      const todays   = all.filter(b => b.date === today);
+      const revenue  = upcoming.reduce((sum, b) => sum + (svcOf(b.serviceId)?.price || 0), 0);
+      const stats = [
+        ['admin.stat.total',    all.length],
+        ['admin.stat.upcoming', upcoming.length],
+        ['admin.stat.today',    todays.length],
+        ['admin.stat.revenue',  `${revenue} ${CURRENCY}`],
+      ];
+      document.getElementById('admin-stats').innerHTML = stats.map(([k, v]) => `
+        <div class="admin-stat">
+          <span class="admin-stat__k">${t(k)}</span>
+          <span class="admin-stat__v">${v}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderSelectOptions() {
+      const bSel = document.getElementById('admin-filter-barber');
+      const sSel = document.getElementById('admin-filter-service');
+      // preserve current value
+      const curB = bSel.value, curS = sSel.value;
+      bSel.innerHTML = `<option value="">${t('admin.filter.barber.all')}</option>` +
+        barbers.map(b => `<option value="${b.id}">${dict[state.lang][`${b.i18n}.name`]}</option>`).join('');
+      sSel.innerHTML = `<option value="">${t('admin.filter.service.all')}</option>` +
+        services.map(s => `<option value="${s.id}">${dict[state.lang][`${s.i18n}.name`]}</option>`).join('');
+      bSel.value = curB; sSel.value = curS;
+    }
+
+    function renderTable(rows) {
+      const root = document.getElementById('admin-table');
+      if (rows.length === 0) {
+        root.innerHTML = `
+          <div class="admin-row admin-row--head">
+            <span>${t('admin.col.id')}</span>
+            <span>${t('admin.col.guest')}</span>
+            <span>${t('admin.col.service')}</span>
+            <span>${t('admin.col.when')}</span>
+            <span>${t('admin.col.contact')}</span>
+            <span>${t('admin.col.actions')}</span>
+          </div>
+          <div class="admin-empty">${t('admin.empty')}</div>
+        `;
+        return;
+      }
+
+      // newest first
+      const sorted = rows.slice().sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+
+      root.innerHTML = `
+        <div class="admin-row admin-row--head">
+          <span>${t('admin.col.id')}</span>
+          <span>${t('admin.col.guest')}</span>
+          <span>${t('admin.col.service')}</span>
+          <span>${t('admin.col.when')}</span>
+          <span>${t('admin.col.contact')}</span>
+          <span>${t('admin.col.actions')}</span>
+        </div>
+      ` + sorted.map(b => {
+        const svc = svcOf(b.serviceId);
+        const brb = brbOf(b.barberId);
+        const svcName = svc ? dict[state.lang][`${svc.i18n}.name`] : '—';
+        const brbName = brb ? dict[state.lang][`${brb.i18n}.name`] : '—';
+        const price   = svc ? `${svc.price} ${CURRENCY}` : '—';
+        const phoneE  = encodeURIComponent(b.phone || '');
+        const phoneHref = b.phone ? `tel:${b.phone.replace(/\s|-/g,'')}` : null;
+        const waHref    = b.phone ? `https://wa.me/${b.phone.replace(/\D/g,'')}` : null;
+        return `
+          <div class="admin-row" data-id="${b.id}">
+            <span class="admin-row__id">${b.id || '—'}</span>
+
+            <span>
+              <span class="admin-row__name">${escapeHtml(b.name || '—')}</span>
+              <span class="admin-row__sub">${brbName} · ${price}</span>
+            </span>
+
+            <span class="admin-row__svc">
+              ${svcName}
+              ${svc ? `<span class="admin-row__sub">${svc.durationMin} ${dict[state.lang]['min']}</span>` : ''}
+            </span>
+
+            <span class="admin-row__when">
+              ${formatDateLong(b.date)} · ${b.time || '—'}
+              <small>${formatCreated(b.createdAt)}</small>
+            </span>
+
+            <span class="admin-row__contact">
+              ${b.phone ? `<a href="${phoneHref}">${escapeHtml(b.phone)}</a>` : '—'}
+              ${waHref  ? ` · <a href="${waHref}" target="_blank" rel="noopener">WhatsApp</a>` : ''}
+              ${b.notes ? `<small>${t('admin.notes')}: ${escapeHtml(b.notes)}</small>` : ''}
+            </span>
+
+            <span class="admin-row__actions">
+              <button class="admin-row__del"  data-del="${b.id}">${t('admin.del')}</button>
+              <button class="admin-row__keep" data-keep="${b.id}" hidden>${t('admin.keep')}</button>
+            </span>
+          </div>
+        `;
+      }).join('');
+
+      // wire two-stage delete (mirrors mine.html cancel UX)
+      root.querySelectorAll('[data-del]').forEach(btn => {
+        const id   = btn.dataset.del;
+        const row  = btn.closest('.admin-row');
+        const keep = row.querySelector(`[data-keep="${CSS.escape(id)}"]`);
+        let pending = false, timer = null;
+        const revert = () => {
+          pending = false;
+          btn.textContent = t('admin.del');
+          btn.classList.remove('is-danger');
+          keep.hidden = true;
+          clearTimeout(timer);
+        };
+        btn.addEventListener('click', () => {
+          if (!pending) {
+            pending = true;
+            btn.textContent = t('admin.del.confirm');
+            btn.classList.add('is-danger');
+            keep.hidden = false;
+            timer = setTimeout(revert, 5000);
+            return;
+          }
+          const next = loadBookings().filter(x => x.id !== id);
+          saveBookings(next);
+          render();
+        });
+        keep.addEventListener('click', revert);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+
+    function render() {
+      const all = loadBookings();
+      renderStats(all);
+      renderSelectOptions();
+      renderTable(applyFilters(all));
+    }
+
+    /* ---------- export ---------- */
+    function exportCsv() {
+      const all = applyFilters(loadBookings());
+      const header = ['id','date','time','service','barber','price','name','phone','notes','createdAt'];
+      const escape = v => {
+        const s = (v ?? '').toString();
+        return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+      };
+      const lines = [header.join(',')];
+      for (const b of all) {
+        const svc = svcOf(b.serviceId);
+        const brb = brbOf(b.barberId);
+        lines.push([
+          b.id, b.date, b.time,
+          svc ? svc.id : b.serviceId,
+          brb ? brb.id : b.barberId,
+          svc ? svc.price : '',
+          b.name, b.phone, b.notes, b.createdAt,
+        ].map(escape).join(','));
+      }
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = `maqass-bookings-${isoToday()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    /* ---------- wire up ---------- */
+    function wire() {
+      document.querySelectorAll('.lang-toggle [data-lang]').forEach(el => {
+        el.addEventListener('click', () => setLanguage(el.dataset.lang));
+      });
+
+      const search   = document.getElementById('admin-search');
+      const fBarber  = document.getElementById('admin-filter-barber');
+      const fService = document.getElementById('admin-filter-service');
+      const fWhen    = document.getElementById('admin-filter-when');
+
+      search.addEventListener('input', () => { state.search = search.value; render(); });
+      fBarber.addEventListener('change',  () => { state.barber  = fBarber.value;  render(); });
+      fService.addEventListener('change', () => { state.service = fService.value; render(); });
+      fWhen.addEventListener('change',    () => { state.when    = fWhen.value;    render(); });
+
+      document.getElementById('admin-export').addEventListener('click', exportCsv);
+      document.getElementById('admin-clear').addEventListener('click', () => {
+        if (loadBookings().length === 0) return;
+        if (!confirm(t('admin.clear.confirm'))) return;
+        saveBookings([]);
+        render();
+      });
+
+      // live refresh if bookings change in another tab (e.g. the guest books)
+      window.addEventListener('storage', e => {
+        if (e.key === 'bookings' || e.key === 'lang') render();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      highlightActiveNav();
+      wire();
+      applyLanguage(); // also triggers initial render()
+    });
+  </script>
+</body>
+</html>
